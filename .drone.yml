@@ -22,7 +22,7 @@ steps:
       from_secret: docker_username
     password:
       from_secret: docker_password
-    repo: rancher/wmi_exporter-package
+    repo: rancher/windows_exporter-package
     tag: ${DRONE_TAG}-windows-1809
   volumes:
   - name: docker_pipe
@@ -82,7 +82,7 @@ steps:
     dockerfile: package/windows/Dockerfile
     password:
       from_secret: docker_password
-    repo: rancher/wmi_exporter-package
+    repo: rancher/windows_exporter-package
     tag: ${DRONE_TAG}-windows-1903
     username:
       from_secret: docker_username
@@ -146,7 +146,7 @@ steps:
       from_secret: docker_username
     password:
       from_secret: docker_password
-    repo: rancher/wmi_exporter-package
+    repo: rancher/windows_exporter-package
     tag: ${DRONE_TAG}-windows-1909
   volumes:
   - name: docker_pipe
@@ -213,7 +213,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      repo: rancher/wmi_exporter-package
+      repo: rancher/windows_exporter-package
       tag: ${DRONE_TAG}-windows-2004
     volumes:
       - name: docker_pipe
@@ -280,7 +280,7 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-      repo: rancher/wmi_exporter-package
+      repo: rancher/windows_exporter-package
       tag: ${DRONE_TAG}-windows-20H2
     volumes:
       - name: docker_pipe

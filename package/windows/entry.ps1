@@ -1,5 +1,5 @@
 # ENTRYPOINT
-$winsPath = "c:\etc\wmi-exporter\wmi-exporter.exe"
+$winsPath = "c:\etc\windows-exporter\windows-exporter.exe"
 
 # default
 $listenPort = "9796"
