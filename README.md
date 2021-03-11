@@ -1,7 +1,7 @@
-wmi_exporter-package
+windows_exporter-package
 ========
 
-this is for package wmi_exporter https://github.com/martinlindhe/wmi_exporter
+this is for package windows_exporter https://github.com/prometheus-community/windows_exporter
 
 ## Building
 
@@ -10,7 +10,7 @@ this is for package wmi_exporter https://github.com/martinlindhe/wmi_exporter
 
 ## Running
 
-`./bin/wmi-exporter-package`
+`./bin/windows-exporter-package`
 
 ## License
 Copyright (c) 2018 [Rancher Labs, Inc.](http://rancher.com)

@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 
 & "$PSScriptRoot\version.ps1" | Out-Null
 
-$baseTag = "wmi-exporter-package:$($env:VERSION)"
+$baseTag = "windows-exporter-package:$($env:VERSION)"
 $currentTag = "rancher/$baseTag"
 $pushTag = "$PushImageToLibrary/$baseTag"
 

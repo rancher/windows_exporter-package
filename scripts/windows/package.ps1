@@ -31,7 +31,7 @@ $RELEASE_ID = $env:RELEASE_ID
 if (-not $RELEASE_ID) {
     $RELEASE_ID = $HOST_RELEASE_ID
 }
-$IMAGE = ('{0}/wmi-exporter-package:{1}-windows-{2}' -f $REPO, $TAG, $RELEASE_ID)
+$IMAGE = ('{0}/windows-exporter-package:{1}-windows-{2}' -f $REPO, $TAG, $RELEASE_ID)
 
 $ARCH = $env:ARCH
 if ($RELEASE_ID -eq $HOST_RELEASE_ID) {
