@@ -2,7 +2,7 @@ ARG SERVERCORE_VERSION
 
 FROM mcr.microsoft.com/windows/servercore:${SERVERCORE_VERSION} as download
 ENV ARCH=amd64
-ENV WINDOWS_EXPORTER_ARCHIVER_VERSION 0.15.0
+ENV WINDOWS_EXPORTER_ARCHIVER_VERSION 0.16.0
 
 SHELL ["powershell", "-NoLogo", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
