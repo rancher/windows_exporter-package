@@ -62,7 +62,7 @@ steps:
       ref:
         - refs/heads/master
         - refs/tags/*
-        -
+
 volumes:
   - name: docker_pipe
     host:
@@ -72,6 +72,7 @@ trigger:
   event:
     exclude:
       - promote
+
 ---
 kind: pipeline
 type: docker
@@ -89,7 +90,7 @@ clone:
 
 steps:
   - name: docker-build
-    image: rancher/drone-images:docker-amd64-ltsc2022
+    image: plugins/docker:windows-ltsc2022-amd64
     settings:
       dry_run: true
       build_args:
@@ -112,7 +113,7 @@ steps:
       event:
         - pull_request
   - name: docker-publish
-    image: rancher/drone-images:docker-amd64-ltsc2022
+    image: plugins/docker:windows-ltsc2022-amd64
     settings:
       build_args:
         - SERVER_VERSION=ltsc2022
@@ -172,8 +173,8 @@ steps:
 trigger:
   event:
     exclude:
-      - promote
+    - promote
 
 depends_on:
-  - windows-1809
-  - windows-2022
+- windows-1809
+- windows-2022
