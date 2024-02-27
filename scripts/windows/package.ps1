@@ -25,30 +25,38 @@ if ($env:DRONE_TAG) {
     $TAG = $env:DRONE_TAG
 }
 
-# Get release id as image tag suffix
-$HOST_RELEASE_ID = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' -ErrorAction Ignore).ReleaseId
-$RELEASE_ID = $env:RELEASE_ID
-if (-not $RELEASE_ID) {
-    $RELEASE_ID = $HOST_RELEASE_ID
-}
-$IMAGE = ('{0}/windows-exporter-package:{1}-windows-{2}' -f $REPO, $TAG, $RELEASE_ID)
+$OS_VERSION = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\' -ErrorAction Ignore).ProductName
+$SERVER_TAG = ""
 
-$ARCH = $env:ARCH
-if ($RELEASE_ID -eq $HOST_RELEASE_ID) {
-    docker build `
-        --build-arg SERVERCORE_VERSION=$RELEASE_ID `
-        --build-arg ARCH=$ARCH `
-        --build-arg VERSION=$TAG `
-        -t $IMAGE `
-        -f Dockerfile .
-} else {
-    docker build `
-        --isolation hyperv `
-        --build-arg SERVERCORE_VERSION=$RELEASE_ID `
-        --build-arg ARCH=$ARCH `
-        --build-arg VERSION=$TAG `
-        -t $IMAGE `
-        -f Dockerfile .
+if ($OS_VERSION.Contains("2022")) {
+    $SERVER_TAG = "ltsc2022"
 }
 
-Write-Host "Built $IMAGE`n"
+if ($OS_VERSION.Contains("2019")) {
+    $SERVER_TAG = "ltsc2019"
+}
+
+if (-not $SERVER_TAG) {
+    if (-not $env:SERVER_TAG) {
+        Write-Host Could not determine Windows Server Version
+        exit 1
+    }
+    $SERVER_TAG = $env:SERVER_TAG
+}
+
+$IMAGE = ('{0}/windows-exporter-package:{1}-windows-{2}' -f $REPO, $TAG, $SERVER_TAG)
+
+# ARCH should be set in version.ps1
+if (-not $env:ARCH) {
+    Write-Host Must specify a build architecture
+    exit 1
+}
+
+# Build the exporter image
+docker build `
+    --build-arg SERVER_VERSION=$SERVER_TAG `
+    --build-arg TARGET_ARCH=$env:ARCH `
+    -t $IMAGE `
+    -f Dockerfile .
+
+Write-Host "Built $IMAGE"
