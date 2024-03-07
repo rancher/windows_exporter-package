@@ -16,6 +16,11 @@ $VERSION = "${COMMIT}${DIRTY}"
 if ((-not $DIRTY) -and ($GIT_TAG)) {
     $VERSION = "${GIT_TAG}"
 }
+
+if (-not $VERSION) {
+    $VERSION = "dev"
+}
+
 $env:VERSION = $VERSION
 
 $ARCH = $env:ARCH
