@@ -7,14 +7,19 @@ if ("$(git status --porcelain --untracked-files=no)") {
 }
 
 $COMMIT = (git rev-parse --short HEAD)
-$GIT_TAG = $env:DRONE_TAG
+$GIT_TAG = $env:TAG
 if (-not $GIT_TAG) {
-    $GIT_TAG = $(git tag -l --contains HEAD | Select-Object -First 1)
+    $TAG = $(git tag -l --contains HEAD | Select-Object -First 1)
 }
 
 $VERSION = "${COMMIT}${DIRTY}"
-if ((-not $DIRTY) -and ($GIT_TAG)) {
-    $VERSION = "${GIT_TAG}"
+if ((-not $DIRTY) -and ($TAG)) {
+    $VERSION = "${TAG}"
+}
+
+if ($DIRTY -and ($TAG -ne "")) {
+    Write-Host "Will not publish a dirty tag"
+    exit 1
 }
 
 if (-not $VERSION) {
