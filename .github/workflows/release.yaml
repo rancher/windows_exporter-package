@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build-push-2022-image:
+    runs-on: windows-2022
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: rancher
+      TAG: ${{ github.ref_name }}
+      ARCH: amd64
+      OS_VERSION: ltsc2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: retrieve dockerhub credentials
+        uses: rancher-eio/read-vault-secrets@main
+        with:
+          secrets: |
+            secret/data/github/repo/${{ github.repository }}/dockerhub/credentials username | DOCKER_USERNAME ;
+            secret/data/github/repo/${{ github.repository }}/dockerhub/credentials password | DOCKER_PASSWORD
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+      - name: build 2022
+        run: $env:REPO="${{ env.REPO }}"; ./scripts/windows/ci.ps1
+      - name: push 2022
+        run: |
+          docker push ${{ env.REPO }}/windows-exporter-package:${{ env.TAG }}-windows-${{ env.OS_VERSION }}
+
+  build-push-2019-image:
+    needs: [ build-push-2022-image ]
+    runs-on: windows-2019
+    permissions:
+      id-token: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: rancher
+      TAG: ${{ github.ref_name }}
+      ARCH: amd64
+      OS_VERSION: ltsc2019
+    steps:
+      - uses: actions/checkout@v4
+      - name: retrieve dockerhub credentials
+        uses: rancher-eio/read-vault-secrets@main
+        with:
+          secrets: |
+            secret/data/github/repo/${{ github.repository }}/dockerhub/credentials username | DOCKER_USERNAME ;
+            secret/data/github/repo/${{ github.repository }}/dockerhub/credentials password | DOCKER_PASSWORD
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+      - name: build 2019
+        run: $env:REPO="${{ env.REPO }}"; ./scripts/windows/ci.ps1
+      - name: push 2019
+        run: |
+          docker push ${{ env.REPO }}/windows-exporter-package:${{ env.TAG }}-windows-${{ env.OS_VERSION }}
+
+  create-manifest:
+    needs: [ build-push-2019-image ]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: rancher
+      TAG: ${{ github.ref_name }}
+    steps:
+      - name: retrieve dockerhub credentials
+        uses: rancher-eio/read-vault-secrets@main
+        with:
+          secrets: |
+            secret/data/github/repo/${{ github.repository }}/dockerhub/credentials username | DOCKER_USERNAME ;
+            secret/data/github/repo/${{ github.repository }}/dockerhub/credentials password | DOCKER_PASSWORD
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+      - name: create and push manifest
+        run: |
+          docker manifest create ${{ env.REPO }}/windows-exporter-package:${{ env.TAG }} ${{ env.REPO }}/windows-exporter-package:${{ env.TAG }}-windows-ltsc2022 ${{ env.REPO }}/windows-exporter-package:${{ env.TAG }}-windows-ltsc2019
+          docker manifest push ${{ env.REPO }}/windows-exporter-package:${{ env.TAG }}
